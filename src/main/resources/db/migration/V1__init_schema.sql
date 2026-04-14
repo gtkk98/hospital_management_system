@@ -55,3 +55,14 @@ CREATE TABLE appointments (
 CREATE INDEX idx_appt_doctor ON appointments(doctor_id);
 CREATE INDEX idx_appt_patient ON appointments(patient_id);
 CREATE INDEX idx_appt_time ON appointments(schedule_at);
+
+-- Medical Records table
+CREATE TABLE medical_records
+(
+    id             BIGSERIAL PRIMARY KEY,
+    appointment_id BIGINT    NOT NULL REFERENCES appointments (id),
+    diagnosis      TEXT,
+    prescription   TEXT,
+    lab_results    TEXT,
+    recorded_at    TIMESTAMP NOT NULL DEFAULT NOW()
+);
