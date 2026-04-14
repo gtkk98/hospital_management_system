@@ -66,3 +66,16 @@ CREATE TABLE medical_records
     lab_results    TEXT,
     recorded_at    TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Invoice table
+CREATE TABLE invoices(
+    id             BIGSERIAL PRIMARY KEY,
+    appointment_id BIGINT    NOT NULL REFERENCES appointments (id),
+    amount         INT       NOT NULL,
+    status         VARCHAR(20) NOT NULL DEFAULT 'UNPAID'
+                      CHECK (status IN ('PENDING', 'PAID', 'CANCELED')),
+    issued_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    paid_at        TIMESTAMP
+);
+
+-- Audit log table
