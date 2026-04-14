@@ -79,3 +79,24 @@ CREATE TABLE invoices(
 );
 
 -- Audit log table
+CREATE TABLE audit_logs
+(
+    id           BIGSERIAL PRIMARY KEY,
+    user_id      BIGINT      NOT NULL REFERENCES users (id) ON DELETE SET NULL,
+    action       VARCHAR(50) NOT NULL,
+    entity_type  VARCHAR(50) NOT NULL,
+    entity_id    BIGINT,
+    performed_at TIMESTAMP   NOT NULL DEFAULT NOW(),
+);
+
+CREATE INDEX idx_audit_user   ON audit_logs(user_id);
+CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id);
+
+
+
+
+
+
+
+
+
