@@ -51,3 +51,7 @@ CREATE TABLE appointments (
         tsrange(schedule_at, schedule_at + (duration_minutes * interval '1 minutes')) WITH &&
     )
 );
+
+CREATE INDEX idx_appt_doctor ON appointments(doctor_id);
+CREATE INDEX idx_appt_patient ON appointments(patient_id);
+CREATE INDEX idx_appt_time ON appointments(schedule_at);
