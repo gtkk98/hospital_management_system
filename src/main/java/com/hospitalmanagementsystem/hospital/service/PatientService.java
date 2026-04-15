@@ -2,6 +2,7 @@ package com.hospitalmanagementsystem.hospital.service;
 
 import com.hospitalmanagementsystem.hospital.dto.request.PatientRequest;
 import com.hospitalmanagementsystem.hospital.dto.response.PatientResponse;
+import com.hospitalmanagementsystem.hospital.exception.PatientNotFoundException;
 import com.hospitalmanagementsystem.hospital.model.Patient;
 import com.hospitalmanagementsystem.hospital.repository.PatientRepository;
 import jakarta.transaction.Transactional;
@@ -21,7 +22,7 @@ public class PatientService {
     public PatientResponse getPatientById(Long id) {
         log.info("Fetching Patient by ID: {}", id);
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new PatientNotFoundException(id));
         return toResponse(patient);
     }
 
@@ -52,7 +53,7 @@ public class PatientService {
     @Transactional
     public PatientResponse updatePatient(Long id, PatientRequest request) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new PatientNotFoundException(id));
 
         patient.setFullName(request.getFullName());
         patient.setDateOfBirth(request.getBirthDate());
@@ -68,7 +69,7 @@ public class PatientService {
     @Transactional
     public void deletePatient(Long id) {
         if (!patientRepository.existsById(id)) {
-            throw new PatientNotFoundException("Patient not found with ID: " + id);
+            throw new PatientNotFoundException(id);
         }
         patientRepository.deleteById(id);
         log.info("Deleted Patient with ID: {}", id);
