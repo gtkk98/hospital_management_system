@@ -48,4 +48,42 @@ public class PatientService {
         log.info("Saved Patient with ID: {}", saved.getId());
         return toResponse(saved);
     }
+
+    @Transactional
+    public PatientResponse updatePatient(Long id, PatientRequest request) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException("Patient not found with ID: " + id));
+
+        patient.setFullName(request.getFullName());
+        patient.setDateOfBirth(request.getBirthDate());
+        patient.setGender(request.getGender());
+        patient.setPhone(request.getPhone());
+        patient.setBloodGroup(request.getBloodGroup());
+        patient.setAddress(request.getAddress());
+
+        // no need to call save()
+        return toResponse(patient);
+    }
+
+    @Transactional
+    public void deletePatient(Long id) {
+        if (!patientRepository.existsById(id)) {
+            throw new PatientNotFoundException("Patient not found with ID: " + id);
+        }
+        patientRepository.deleteById(id);
+        log.info("Deleted Patient with ID: {}", id);
+    }
+
+    // private helper method to convert entity to response DTO
+    private PatientResponse toResponse(Patient p) {
+        return PatientResponse.builder()
+                .id(p.getId())
+                .fullName(p.getFullName())
+                .dateOfBirth(p.getDateOfBirth())
+                .gender(p.getGender())
+                .phone(p.getPhone())
+                .bloodGroup(p.getBloodGroup())
+                .address(p.getAddress())
+                .build();
+    }
 }
