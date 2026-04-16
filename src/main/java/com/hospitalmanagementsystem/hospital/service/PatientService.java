@@ -36,9 +36,10 @@ public class PatientService {
 
     @Transactional
     public PatientResponse createPatient(PatientRequest request) {
+        log.info("Creating new patient: {}", request.getFullName());
         Patient patient = Patient.builder()
                 .fullName(request.getFullName())
-                .dateOfBirth(request.getBirthDate())
+                .dateOfBirth(request.getDateOfBirth())
                 .gender(request.getGender())
                 .phone(request.getPhone())
                 .bloodGroup(request.getBloodGroup())
@@ -56,7 +57,7 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(id));
 
         patient.setFullName(request.getFullName());
-        patient.setDateOfBirth(request.getBirthDate());
+        patient.setDateOfBirth(request.getDateOfBirth());
         patient.setGender(request.getGender());
         patient.setPhone(request.getPhone());
         patient.setBloodGroup(request.getBloodGroup());
