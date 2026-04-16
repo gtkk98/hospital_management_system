@@ -51,4 +51,21 @@ public class GlobalExceptionHandler {
                         "status", 500
                 ));
     }
+
+    @ExceptionHandler(DoctorNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleDoctorNotFound(DoctorNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "error",     ex.getMessage(),
+                "status",    404,
+                "timestamp", LocalDateTime.now().toString()
+        ));
+    }
+
+    @ExceptionHandler(DuplicateLicenseException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateLicense(DuplicateLicenseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "error",  ex.getMessage(),
+                "status", 409
+        ));
+    }
 }
