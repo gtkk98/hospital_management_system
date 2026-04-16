@@ -3,6 +3,8 @@ package com.hospitalmanagementsystem.hospital.service;
 import com.hospitalmanagementsystem.hospital.dto.request.DoctorRequest;
 import com.hospitalmanagementsystem.hospital.dto.response.DoctorAvailabilityResponse;
 import com.hospitalmanagementsystem.hospital.dto.response.DoctorResponse;
+import com.hospitalmanagementsystem.hospital.exception.DoctorNotFoundException;
+import com.hospitalmanagementsystem.hospital.exception.DuplicateLicenseException;
 import com.hospitalmanagementsystem.hospital.model.Doctor;
 import com.hospitalmanagementsystem.hospital.model.Doctor.Specialization;
 import com.hospitalmanagementsystem.hospital.repository.DoctorRepository;
