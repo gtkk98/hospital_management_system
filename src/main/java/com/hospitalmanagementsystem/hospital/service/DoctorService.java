@@ -1,14 +1,17 @@
 package com.hospitalmanagementsystem.hospital.service;
 
+import com.hospitalmanagementsystem.hospital.dto.request.DoctorRequest;
 import com.hospitalmanagementsystem.hospital.dto.response.DoctorAvailabilityResponse;
 import com.hospitalmanagementsystem.hospital.dto.response.DoctorResponse;
 import com.hospitalmanagementsystem.hospital.model.Doctor;
 import com.hospitalmanagementsystem.hospital.model.Doctor.Specialization;
 import com.hospitalmanagementsystem.hospital.repository.DoctorRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -64,5 +67,22 @@ public class DoctorService {
     }
 
     // Write Operations
+    @Transactional
+    public DoctorResponse createDoctor(DoctorRequest request) {
+        if (doctorRepository.existsByLicenseNumber(request.getLicenseNumber())) {
+            throw new DuplicateLicenseException(request.getLicenseNumber());
+        }
 
+        Doctor doctor = Doctor.builder()
+                .fullName(request.getFullName())
+                .specialization(request.getSpecialization())
+                .licenseNumber(request.getLicenseNumber())
+                .phone(request.getPhone())
+                .consultationFee(request.getConsultationFee())
+                .build();
+
+        Doctor saved = doctorRepository.save(doctor);
+        log.info("Doctor created: {} ({})", saved.getFullName(), saved.getSpecialization());
+        return toResponse(saved);
+    }
 }
