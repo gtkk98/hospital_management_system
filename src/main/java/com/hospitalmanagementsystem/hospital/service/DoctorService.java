@@ -116,6 +116,15 @@ public class DoctorService {
         return toResponse(doctor);
     }
 
+    @Transactional
+    public void deleteDoctor(Long id) {
+        if (!doctorRepository.existsById(id)) {
+            throw new DoctorNotFoundException(id);
+        }
+        doctorRepository.deleteById(id);
+        log.info("Doctor {} deleted", id);
+    }
+
     // Mapper
     private DoctorResponse toResponse(Doctor d) {
         return DoctorResponse.builder()
