@@ -2,8 +2,7 @@ package com.hospitalmanagementsystem.hospital.service;
 
 import com.hospitalmanagementsystem.hospital.dto.request.AppointmentRequest;
 import com.hospitalmanagementsystem.hospital.dto.response.AppointmentResponse;
-import com.hospitalmanagementsystem.hospital.exception.DoctorNotFoundException;
-import com.hospitalmanagementsystem.hospital.exception.PatientNotFoundException;
+import com.hospitalmanagementsystem.hospital.exception.*;
 import com.hospitalmanagementsystem.hospital.model.Appointment;
 import com.hospitalmanagementsystem.hospital.model.Appointment.Status;
 import com.hospitalmanagementsystem.hospital.model.Doctor;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,6 +51,15 @@ public class AppointmentService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    public List<AppointmentResponse> getDoctorScheduleForDay(Long doctorId, LocalDate date) {
+        LocalDateTime dayStart = date.atStartOfDay();
+        LocalDateTime dayEnd   = date.plusDays(1).atStartOfDay();
+        return appointmentRepository
+                .findDoctorScheduleForDay(doctorId, dayStart, dayEnd)
+                .stream().map(this::toResponse).toList();
+    }
+
 
     // Booking
     // appointment + invoice created together — both succeed or both fail
