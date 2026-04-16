@@ -85,4 +85,25 @@ public class DoctorService {
         log.info("Doctor created: {} ({})", saved.getFullName(), saved.getSpecialization());
         return toResponse(saved);
     }
+
+    @Transactional
+    public DoctorResponse updateDoctor(Long id, DoctorRequest request ) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorNotFoundException(id));
+
+        // If license number changed, check the new one isn't taken by someone else
+        if (!doctor.getLicenseNumber().equals(request.getLicenseNumber())
+                && doctorRepository.existsByLicenseNumber(request.getLicenseNumber())) {
+            throw new DuplicateLicenseException(request.getLicenseNumber());
+        }
+
+        doctor.setFullName(request.getFullName());
+        doctor.setSpecialization(request.getSpecialization());
+        doctor.setLicenseNumber(request.getLicenseNumber());
+        doctor.setPhone(request.getPhone());
+        doctor.setConsultationFee(request.getConsultationFee());
+
+        log.info("Doctor {} updated", id);
+        return toResponse(doctor);
+    }
 }
