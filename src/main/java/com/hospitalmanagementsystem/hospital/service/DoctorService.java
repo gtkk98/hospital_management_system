@@ -106,4 +106,23 @@ public class DoctorService {
         log.info("Doctor {} updated", id);
         return toResponse(doctor);
     }
+
+    // Mapper
+    private DoctorResponse toResponse(Doctor d) {
+        return DoctorResponse.builder()
+                .id(d.getId())
+                .fullName(d.getFullName())
+                .specialization(d.getSpecialization())
+                .licenseNumber(d.getLicenseNumber())
+                .phone(d.getPhone())
+                .consultationFee(d.getConsultationFee())
+                .consultationFeeFormatted(formatFee(d.getConsultationFee()))
+                .build();
+    }
+
+    // Converts 50000 (cents) → "LKR 500.00"
+    private String formatFee(Integer cents) {
+        if (cents == null) return "LKR 0.00";
+        return String.format("LKR %.2f", cents / 100.0);
+    }
 }
