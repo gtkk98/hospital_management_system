@@ -68,4 +68,33 @@ public class GlobalExceptionHandler {
                 "status", 409
         ));
     }
+
+    @ExceptionHandler({
+            AppointmentNotFoundException.class,
+            PatientNotFoundException.class,
+            DoctorNotFoundException.class
+    })
+    public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody(ex.getMessage(), 404));
+    }
+
+    @ExceptionHandler(DoubleBookingException.class)
+    public ResponseEntity<Map<String, Object>> handleDoubleBooking(DoubleBookingException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(ex.getMessage(), 409));
+    }
+
+    @ExceptionHandler({BusinessHoursException.class, CancellationWindowException.class,
+            InvalidStatusTransitionException.class})
+    public ResponseEntity<Map<String, Object>> handleBadRequest(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(ex.getMessage(), 400));
+    }
+
+    // Clean private helper — stops you repeating Map.of(...) everywhere
+    private Map<String, Object> errorBody(String message, int status) {
+        return Map.of(
+                "error",     message,
+                "status",    status,
+                "timestamp", LocalDateTime.now().toString()
+        );
+    }
 }
