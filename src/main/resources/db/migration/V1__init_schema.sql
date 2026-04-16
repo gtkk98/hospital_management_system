@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- User table
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL
                    CHECK (role IN ('ADMIN', 'DOCTOR', 'PATIENT')),
@@ -14,7 +14,7 @@ CREATE TABLE users (
 -- Patient table
 CREATE TABLE patients (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    user_id BIGINT UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     full_name VARCHAR(100) NOT NULL,
     date_of_birth DATE,
     gender VARCHAR(10)
@@ -79,14 +79,13 @@ CREATE TABLE invoices(
 );
 
 -- Audit log table
-CREATE TABLE audit_logs
-(
+CREATE TABLE audit_logs(
     id           BIGSERIAL PRIMARY KEY,
-    user_id      BIGINT      NOT NULL REFERENCES users (id) ON DELETE SET NULL,
+    user_id      BIGINT REFERENCES users(id) ON DELETE SET NULL,
     action       VARCHAR(50) NOT NULL,
     entity_type  VARCHAR(50) NOT NULL,
     entity_id    BIGINT,
-    performed_at TIMESTAMP   NOT NULL DEFAULT NOW(),
+    performed_at TIMESTAMP   NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_audit_user   ON audit_logs(user_id);
