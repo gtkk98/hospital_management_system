@@ -43,6 +43,13 @@ public class DoctorService {
                 .toList();
     }
 
+    public List<DoctorResponse> searchDoctors(String name) {
+        return doctorRepository.findByFullnameContainingIgnoreCase(name)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     // Availability check
     public List<DoctorAvailabilityResponse> findAvailableDoctors(
             Specialization spec,
