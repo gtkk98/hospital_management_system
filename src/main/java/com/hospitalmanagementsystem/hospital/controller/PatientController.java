@@ -24,7 +24,8 @@ public class PatientController {
         return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
-    // GET /api/patients?name=kamal
+    // GET /api/patients?name=
+    @GetMapping
     public ResponseEntity<List<PatientResponse>> searchPatients(
             @RequestParam(defaultValue = "") String name) {
         return ResponseEntity.ok(patientService.searchPatient(name));
