@@ -14,7 +14,7 @@ public class PatientRequest {
     @Size(max = 100, message = "Full name must be at most 100 characters")
     private String fullName;
 
-    private LocalDate birthDate;
+    private LocalDate dateOfBirth;
     private Gender gender;
 
     @Size(max = 20)
