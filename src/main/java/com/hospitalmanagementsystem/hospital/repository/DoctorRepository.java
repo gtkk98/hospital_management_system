@@ -17,7 +17,7 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     List<Doctor> findBySpecialization(Specialization specialization);
 
     // Search by name
-    List<Doctor> findByFullnameContainingIgnoreCase(String name);
+    List<Doctor> findByFullNameContainingIgnoreCase(String name);
 
     // Check license number uniqueness
     boolean existsByLicenseNumber(String licenseNumber);
