@@ -14,7 +14,7 @@ public class DoctorRequest {
     @Size(max = 100)
     private String fullName;
 
-    @NotBlank(message = "Specialization is required")
+    @NotNull(message = "Specialization is required")
     private Specialization specialization;
 
     @NotBlank(message = "License number is required")
