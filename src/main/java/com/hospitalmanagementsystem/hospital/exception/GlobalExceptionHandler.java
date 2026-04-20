@@ -2,31 +2,48 @@ package com.hospitalmanagementsystem.hospital.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice  // catches exceptions from ALL controllers in one place
+@RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(PatientNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(PatientNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                Map.of(
-                        "error", ex.getMessage(),
-                        "status", 404,
-                        "timestamp", LocalDateTime.now().toString()
-        ));
+
+    // -----------------------------
+    // 404 - NOT FOUND
+    // -----------------------------
+    @ExceptionHandler({
+            PatientNotFoundException.class,
+            DoctorNotFoundException.class,
+            AppointmentNotFoundException.class
+    })
+    public ResponseEntity<Map<String, Object>> handleNotFound(Exception ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(errorBody(ex.getMessage(), 404));
     }
 
-    // Handles @Valid failures — returns which fields failed and why
+    // -----------------------------
+    // 400 - BAD REQUEST
+    // -----------------------------
+    @ExceptionHandler({
+            BusinessHoursException.class,
+            CancellationWindowException.class,
+            InvalidStatusTransitionException.class,
+            DuplicateLicenseException.class
+    })
+    public ResponseEntity<Map<String, Object>> handleBadRequest(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorBody(ex.getMessage(), 400));
+    }
+
+    // Validation (@Valid) errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -34,67 +51,33 @@ public class GlobalExceptionHandler {
                         f -> f.getField(),
                         f -> f.getDefaultMessage()
                 ));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of(
-                        "error", "Validation failed",
-                        "fields",  fieldErrors,
-                        "status", 400
-                ));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "error", "validation failed",
+                "fields", fieldErrors,
+                "status", 400
+        ));
     }
 
-    // Catch-all for anything unexcepted
+    // -----------------------------
+    // 500 - INTERNAL SERVER ERROR
+    // -----------------------------
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                Map.of(
-                        "error", "An unexpected error occurred",
-                        "status", 500
-                ));
+    public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(errorBody(ex.getMessage(), 500));
     }
 
-    @ExceptionHandler(DoctorNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleDoctorNotFound(DoctorNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                "error",     ex.getMessage(),
-                "status",    404,
-                "timestamp", LocalDateTime.now().toString()
-        ));
-    }
-
-    @ExceptionHandler(DuplicateLicenseException.class)
-    public ResponseEntity<Map<String, Object>> handleDuplicateLicense(DuplicateLicenseException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "error",  ex.getMessage(),
-                "status", 409
-        ));
-    }
-
-    @ExceptionHandler({
-            AppointmentNotFoundException.class,
-            PatientNotFoundException.class,
-            DoctorNotFoundException.class
-    })
-    public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody(ex.getMessage(), 404));
-    }
-
-    @ExceptionHandler(DoubleBookingException.class)
-    public ResponseEntity<Map<String, Object>> handleDoubleBooking(DoubleBookingException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(ex.getMessage(), 409));
-    }
-
-    @ExceptionHandler({BusinessHoursException.class, CancellationWindowException.class,
-            InvalidStatusTransitionException.class})
-    public ResponseEntity<Map<String, Object>> handleBadRequest(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(ex.getMessage(), 400));
-    }
-
-    // Clean private helper — stops you repeating Map.of(...) everywhere
+    // Utility method
     private Map<String, Object> errorBody(String message, int status) {
         return Map.of(
-                "error",     message,
-                "status",    status,
+                "error", message,
+                "status", status,
                 "timestamp", LocalDateTime.now().toString()
         );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorBody(ex.getMessage(), 401));
     }
 }
