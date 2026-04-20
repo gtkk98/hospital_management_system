@@ -46,7 +46,7 @@ public class DoctorService {
     }
 
     public List<DoctorResponse> searchDoctors(String name) {
-        return doctorRepository.findByFullnameContainingIgnoreCase(name)
+        return doctorRepository.findByFullNameContainingIgnoreCase(name)
                 .stream()
                 .map(this::toResponse)
                 .toList();
